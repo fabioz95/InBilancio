@@ -20,7 +20,7 @@ export function Modal({ open, onClose, title, children, onBack, footer }: ModalP
         onClick={onClose}
         className="absolute inset-0 cursor-default"
       />
-      <div className="relative z-10 flex max-h-[92vh] w-full flex-col rounded-t-2xl border border-border bg-card md:max-w-md md:rounded-2xl">
+      <div className="relative z-10 flex max-h-[92dvh] w-full flex-col rounded-t-2xl border border-border bg-card md:max-w-md md:rounded-2xl">
         <div className="flex items-center gap-2 border-b border-border px-4 py-3.5">
           {onBack && (
             <button type="button" onClick={onBack} aria-label="Indietro" className="text-muted hover:text-fg">

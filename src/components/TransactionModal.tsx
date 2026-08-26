@@ -15,6 +15,7 @@ import { AccountPicker } from './AccountPicker'
 import { Toggle } from './Toggle'
 import { CategoryIcon } from './CategoryIcon'
 import { IconCheck, IconTrash, IconWallet } from './icons'
+import { useOnlineStatus } from '../hooks/useOnlineStatus'
 import { fromDateInputValue, startOfDay, toDateInputValue } from '../utils/date'
 import type { RecurrenceRule, TransactionType } from '../types'
 
@@ -71,6 +72,7 @@ export function TransactionModal() {
 
   const [pickerOpen, setPickerOpen] = useState<'category' | 'account' | 'toAccount' | null>(null)
   const amountInputRef = useRef<HTMLInputElement>(null)
+  const isOnline = useOnlineStatus()
 
   useEffect(() => {
     if (!isOpen) return
@@ -139,29 +141,41 @@ export function TransactionModal() {
         recurrenceRule: isRecurring ? recurrenceRule : null,
       }
 
-      if (editing) {
-        // Modifica di una transazione esistente: non tocca l'eventuale ricorrenza collegata.
-        await updateTransaction(dataOwnerUid, editing.id, draft)
-      } else if (isRecurring && type !== 'transfer') {
-        // Nuova transazione segnata come ricorrente: crea anche il template, così le
-        // occorrenze dei mesi successivi verranno proiettate automaticamente.
-        const templateId = await addRecurringTemplate(dataOwnerUid, {
-          amount,
-          type,
-          categoryId,
-          accountId,
-          description: description.trim(),
-          recurrenceRule,
-          startDate: startOfDay(date),
-          active: true,
-        })
-        await setTransactionForOccurrence(dataOwnerUid, templateId, startOfDay(date), draft)
+      const writePromise = (async () => {
+        if (editing) {
+          // Modifica di una transazione esistente: non tocca l'eventuale ricorrenza collegata.
+          await updateTransaction(dataOwnerUid, editing.id, draft)
+        } else if (isRecurring && type !== 'transfer') {
+          // Nuova transazione segnata come ricorrente: crea anche il template, così le
+          // occorrenze dei mesi successivi verranno proiettate automaticamente.
+          const templateId = await addRecurringTemplate(dataOwnerUid, {
+            amount,
+            type,
+            categoryId,
+            accountId,
+            description: description.trim(),
+            recurrenceRule,
+            startDate: startOfDay(date),
+            active: true,
+          })
+          await setTransactionForOccurrence(dataOwnerUid, templateId, startOfDay(date), draft)
+        } else {
+          await addTransaction(dataOwnerUid, {
+            ...draft,
+            recurringTemplateId: null,
+            recurringOccurrenceDate: null,
+          })
+        }
+      })()
+
+      // Le scritture Firestore non risolvono finché si è offline (restano in
+      // coda e partono da sole alla riconnessione): online aspettiamo l'esito
+      // per poter mostrare un eventuale errore, offline chiudiamo subito,
+      // perché la transazione è già visibile localmente grazie alla cache.
+      if (isOnline) {
+        await writePromise
       } else {
-        await addTransaction(dataOwnerUid, {
-          ...draft,
-          recurringTemplateId: null,
-          recurringOccurrenceDate: null,
-        })
+        writePromise.catch((e) => console.error('Sincronizzazione rimandata (offline)', e))
       }
       close()
     } catch (e) {
@@ -176,7 +190,12 @@ export function TransactionModal() {
     if (!dataOwnerUid || !editing) return
     setSaving(true)
     try {
-      await deleteTransaction(dataOwnerUid, editing.id)
+      const deletePromise = deleteTransaction(dataOwnerUid, editing.id)
+      if (isOnline) {
+        await deletePromise
+      } else {
+        deletePromise.catch((e) => console.error('Eliminazione rimandata (offline)', e))
+      }
       close()
     } catch (e) {
       setError('Impossibile eliminare la transazione.')

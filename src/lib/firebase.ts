@@ -7,7 +7,12 @@ import {
   getRedirectResult,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import {
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -24,7 +29,26 @@ export const isFirebaseConfigured = Boolean(
 
 export const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
-export const db = getFirestore(app)
+
+/**
+ * Cache locale persistente (IndexedDB) con supporto multi-tab: le letture
+ * vengono servite dalla cache quando offline e le scritture (nuove spese,
+ * modifiche, ecc.) vengono accodate localmente e inviate automaticamente al
+ * backend appena torna la connessione, senza bisogno di logica di sync manuale.
+ * Se il browser non supporta IndexedDB (es. modalità privata su alcuni
+ * browser), ripieghiamo sulla cache in memoria di default: l'app resta
+ * utilizzabile, semplicemente senza persistenza tra un riavvio e l'altro.
+ */
+export const db = (() => {
+  try {
+    return initializeFirestore(app, {
+      localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+    })
+  } catch (e) {
+    console.warn('Persistenza offline Firestore non disponibile, uso la cache in memoria.', e)
+    return getFirestore(app)
+  }
+})()
 
 const googleProvider = new GoogleAuthProvider()
 

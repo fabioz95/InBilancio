@@ -163,6 +163,20 @@ export function IconArrowDown(props: IconProps) {
   )
 }
 
+export function IconWifiOff(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M2 2l20 20" />
+      <path d="M8.5 16.5a5 5 0 0 1 7 0" />
+      <path d="M5 12.5a10.5 10.5 0 0 1 3.5-2.4" />
+      <path d="M12.5 8.04A10.5 10.5 0 0 1 19 12.5" />
+      <path d="M2 8.5a15 15 0 0 1 4.5-3" />
+      <path d="M17 6.4A15 15 0 0 1 22 8.5" />
+      <path d="M12 20h.01" />
+    </svg>
+  )
+}
+
 export function IconTransfer(props: IconProps) {
   return (
     <svg {...base(props)}>

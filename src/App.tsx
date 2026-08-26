@@ -5,6 +5,7 @@ import { useAutoInsertRecurring } from './hooks/useAutoInsertRecurring'
 import { useAuthStore } from './store/authStore'
 import { completeRedirectSignIn } from './lib/firebase'
 import { AppShell } from './components/layout/AppShell'
+import { OfflineBanner } from './components/OfflineBanner'
 import { Login } from './pages/Login'
 import { Overview } from './pages/Overview'
 import { Charts } from './pages/Charts'
@@ -39,18 +40,35 @@ export default function App() {
     document.documentElement.classList.toggle('light', settings.theme === 'light')
   }, [settings.theme])
 
-  if (initializing) return <LoadingScreen />
+  if (initializing) {
+    return (
+      <>
+        <OfflineBanner />
+        <LoadingScreen />
+      </>
+    )
+  }
 
-  if (!user) return <Login />
+  if (!user) {
+    return (
+      <>
+        <OfflineBanner />
+        <Login />
+      </>
+    )
+  }
 
   return (
-    <Routes>
-      <Route element={<AppShell />}>
-        <Route path="/" element={<Overview />} />
-        <Route path="/grafici" element={<Charts />} />
-        <Route path="/impostazioni" element={<Settings />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+    <>
+      <OfflineBanner />
+      <Routes>
+        <Route element={<AppShell />}>
+          <Route path="/" element={<Overview />} />
+          <Route path="/grafici" element={<Charts />} />
+          <Route path="/impostazioni" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </>
   )
 }

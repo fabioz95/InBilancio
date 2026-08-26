@@ -11,3 +11,11 @@ createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </StrictMode>
 )
+
+// Registrato solo in produzione: in sviluppo interferirebbe con l'hot reload
+// di Vite servendo asset dalla cache invece che dal dev server.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((e) => console.error('Registrazione service worker fallita', e))
+  })
+}

@@ -341,12 +341,17 @@ export function subscribeRecurringTemplates(
 }
 
 export async function addRecurringTemplate(uid: string, draft: RecurringTemplateDraft) {
-  const ref = await addDoc(collection(db, 'users', uid, 'recurringTemplates'), {
+  // Genera il riferimento (con ID lato client) invece di usare addDoc così l'ID
+  // è disponibile subito, senza aspettare l'ack del backend: setDoc() infatti
+  // non risolve finché si è offline, e chi chiama questa funzione ha bisogno
+  // dell'ID subito per creare la prima occorrenza collegata (vedi TransactionModal).
+  const ref = doc(collection(db, 'users', uid, 'recurringTemplates'))
+  void setDoc(ref, {
     ...draft,
     startDate: Timestamp.fromMillis(draft.startDate),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  })
+  }).catch((e) => console.error('Errore salvataggio template ricorrente', e))
   return ref.id
 }
 

@@ -20,7 +20,7 @@ export function useAuthListener() {
     let unsubMembers: (() => void) | null = null
     let lastDataOwnerUid: string | null = null
 
-    const unsubAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
       unsubProfile?.()
       unsubProfile = null
       unsubMembers?.()
@@ -29,15 +29,16 @@ export function useAuthListener() {
 
       if (firebaseUser) {
         setUser(firebaseUser)
-        try {
-          await ensureUserDocument(firebaseUser.uid, {
-            displayName: firebaseUser.displayName,
-            email: firebaseUser.email,
-            photoURL: firebaseUser.photoURL,
-          })
-        } catch (e) {
-          console.error('Errore inizializzazione utente', e)
-        }
+        // Non blocca l'avvio: le scritture Firestore non risolvono finché si è
+        // offline, quindi un `await` qui terrebbe l'app sulla schermata di
+        // caricamento a tempo indeterminato senza connessione. Il documento
+        // utente esiste già (creato al primo accesso, quando si era online),
+        // quindi subscribeUserProfile qui sotto legge subito dalla cache locale.
+        ensureUserDocument(firebaseUser.uid, {
+          displayName: firebaseUser.displayName,
+          email: firebaseUser.email,
+          photoURL: firebaseUser.photoURL,
+        }).catch((e) => console.error('Errore inizializzazione utente', e))
 
         unsubProfile = subscribeUserProfile(firebaseUser.uid, (profile) => {
           setSettings(profile.settings)

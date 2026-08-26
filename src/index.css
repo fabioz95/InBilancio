@@ -47,6 +47,18 @@
     -moz-appearance: textfield;
   }
 
+  /* iOS Safari fa zoom automatico sulla pagina quando un campo di testo che
+     riceve il focus ha font-size < 16px. Le nostre input usano spesso text-sm
+     (14px): forziamo 16px solo sotto i 768px così l'utente non vede più lo
+     zoom improvviso al tap, senza toccare le dimensioni su desktop. */
+  @media (max-width: 767px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
   /* `color-scheme` sopra fa già adattare i controlli nativi (select, date, ecc.)
      al tema corrente; qui rinforziamo esplicitamente i colori delle opzioni dei
      <select>, perché alcuni browser (es. Chrome desktop) ignorano il colore

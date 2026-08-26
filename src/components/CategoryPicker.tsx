@@ -27,12 +27,14 @@ export function CategoryPicker({ open, onClose, categories, type, selectedId, on
   return (
     <Modal open={open} onClose={onClose} title="Categoria">
       {categories.length > 6 && (
-        <div className="mb-3 flex items-center gap-2 rounded-xl border border-border bg-bg px-3 py-2">
+        <div className="sticky top-0 z-10 mb-3 flex items-center gap-2 rounded-xl border border-border bg-bg px-3 py-2">
           <IconSearch size={16} className="shrink-0 text-muted" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Cerca categoria…"
+            autoCapitalize="none"
+            autoCorrect="off"
             className="w-full bg-transparent text-sm text-fg placeholder:text-muted outline-none"
           />
           {query && (

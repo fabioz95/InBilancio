@@ -1,0 +1,19 @@
+{
+  "name": "InBilancio",
+  "short_name": "InBilancio",
+  "description": "Gestione spese ed entrate personali",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1a1b1f",
+  "theme_color": "#1a1b1f",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
