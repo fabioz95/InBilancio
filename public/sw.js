@@ -5,9 +5,17 @@
 //
 // Cambiare CACHE_VERSION forza tutti i client a scaricare i nuovi asset e a
 // scartare la cache precedente al prossimo avvio.
-const CACHE_VERSION = 'v1'
+const CACHE_VERSION = 'v6'
 const CACHE_NAME = `inbilancio-${CACHE_VERSION}`
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/favicon.svg']
+const APP_SHELL = [
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/favicon.svg',
+  '/apple-touch-icon.png',
+  '/icon-192.png',
+  '/icon-512.png',
+]
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()

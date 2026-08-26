@@ -47,18 +47,6 @@
     -moz-appearance: textfield;
   }
 
-  /* iOS Safari fa zoom automatico sulla pagina quando un campo di testo che
-     riceve il focus ha font-size < 16px. Le nostre input usano spesso text-sm
-     (14px): forziamo 16px solo sotto i 768px così l'utente non vede più lo
-     zoom improvviso al tap, senza toccare le dimensioni su desktop. */
-  @media (max-width: 767px) {
-    input,
-    select,
-    textarea {
-      font-size: 16px;
-    }
-  }
-
   /* `color-scheme` sopra fa già adattare i controlli nativi (select, date, ecc.)
      al tema corrente; qui rinforziamo esplicitamente i colori delle opzioni dei
      <select>, perché alcuni browser (es. Chrome desktop) ignorano il colore
@@ -87,5 +75,23 @@
     box-shadow:
       0 10px 30px rgba(0, 0, 0, 0.12),
       inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* iOS Safari fa zoom automatico sulla pagina quando un campo di testo che
+   riceve il focus ha font-size < 16px. Le nostre input usano spesso text-sm
+   (14px): forziamo 16px solo sotto i 768px così l'utente non vede più lo
+   zoom improvviso al tap, senza toccare le dimensioni su desktop.
+   Questa regola sta volutamente FUORI da @layer: dentro a @layer base veniva
+   sempre battuta dalle utility di Tailwind (es. text-sm), che vivono in
+   @layer utilities e hanno priorità maggiore a prescindere dalla specificità
+   del selettore. Fuori dai layer, invece, vince sempre su qualsiasi classe
+   Tailwind, garantendo che il font resti a 16px indipendentemente dalla
+   classe applicata al singolo campo. */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }

@@ -25,7 +25,7 @@ export function CategoryPicker({ open, onClose, categories, type, selectedId, on
     .filter((c) => c.name.toLowerCase().includes(query.trim().toLowerCase()))
 
   return (
-    <Modal open={open} onClose={onClose} title="Categoria">
+    <Modal open={open} onClose={onClose} title="Categoria" avoidKeyboard>
       {categories.length > 6 && (
         <div className="sticky top-0 z-10 mb-3 flex items-center gap-2 rounded-xl border border-border bg-bg px-3 py-2">
           <IconSearch size={16} className="shrink-0 text-muted" />
