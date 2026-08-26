@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --color-bg: 26 27 31;
+    --color-card: 37 38 43;
+    --color-border: 51 52 58;
+    --color-fg: 255 255 255;
+    --color-muted: 148 151 163;
+    --color-accent: 109 93 252;
+    --color-income: 61 220 151;
+    --color-expense: 255 97 97;
+  }
+
+  :root.light {
+    color-scheme: light;
+    --color-bg: 244 244 246;
+    --color-card: 255 255 255;
+    --color-border: 228 228 232;
+    --color-fg: 21 22 26;
+    --color-muted: 93 97 108;
+    --color-accent: 109 93 252;
+    --color-income: 22 163 74;
+    --color-expense: 220 38 38;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-fg antialiased;
+    font-feature-settings: 'ss01' 1;
+  }
+
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  /* `color-scheme` sopra fa già adattare i controlli nativi (select, date, ecc.)
+     al tema corrente; qui rinforziamo esplicitamente i colori delle opzioni dei
+     <select>, perché alcuni browser (es. Chrome desktop) ignorano il colore
+     ereditato dal <select> e mostrano le opzioni con lo sfondo di sistema. */
+  select option {
+    background-color: rgb(var(--color-card));
+    color: rgb(var(--color-fg));
+  }
+
+  /* Sfondo "liquid glass" per la bottom nav flottante su mobile: blur + saturazione
+     dietro il contenuto, con un leggero gradiente e un bordo che simula il riflesso
+     di vetro tipico dei tab bar iOS. */
+  .glass-nav {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  :root.light .glass-nav {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.4));
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+}
