@@ -9,6 +9,7 @@ import { SearchBar } from '../components/SearchBar'
 import { TransactionList } from '../components/TransactionList'
 import { IconChevronDown, IconRepeat } from '../components/icons'
 import { setTransactionForOccurrence } from '../lib/firestore'
+import { computeTotalBalance } from '../utils/balance'
 import { endOfMonth, startOfMonth } from '../utils/date'
 import { buildDraftFromTemplate, getUnpaidOccurrences } from '../utils/recurring'
 import type { Transaction } from '../types'
@@ -20,6 +21,7 @@ const COLLAPSE_THRESHOLD = 2
 export function Overview() {
   const transactions = useDataStore((s) => s.transactions)
   const categories = useDataStore((s) => s.categories)
+  const accounts = useDataStore((s) => s.accounts)
   const recurringTemplates = useDataStore((s) => s.recurringTemplates)
   const settings = useAuthStore((s) => s.settings)
   const dataOwnerUid = useAuthStore((s) => s.dataOwnerUid)
@@ -57,6 +59,12 @@ export function Overview() {
     }
     return { income, expense }
   }, [monthTransactions])
+
+  // Saldo totale di tutti i conti: indipendente dal mese selezionato.
+  const totalBalance = useMemo(
+    () => computeTotalBalance(accounts, transactions),
+    [accounts, transactions]
+  )
 
   const unpaidRecurring = useMemo(
     () => getUnpaidOccurrences(recurringTemplates, transactions, monthStart.getTime(), monthEnd.getTime()),
@@ -139,7 +147,12 @@ export function Overview() {
         />
       </div>
 
-      <SummaryCard income={income} expense={expense} currency={settings.currency} />
+      <SummaryCard
+        income={income}
+        expense={expense}
+        totalBalance={totalBalance}
+        currency={settings.currency}
+      />
 
       {unpaidRecurring.length > 0 && !search && (
         <>
